@@ -16,7 +16,7 @@ class TelemetryApp(QMainWindow):
         self.temperature_data = deque(maxlen=100)
         self.humidity_data = deque(maxlen=100)
         self.power_data = deque(maxlen=100)
-        self.light_data = deque(maxlen=100)  # Added for light graph
+        self.light_data = deque(maxlen=100)
         self.time_data = deque(maxlen=100)
         self.counter = 0
 
@@ -38,7 +38,7 @@ class TelemetryApp(QMainWindow):
         self.temperature_graph = pg.PlotWidget()
         self.humidity_graph = pg.PlotWidget()
         self.power_graph = pg.PlotWidget()
-        self.light_graph = pg.PlotWidget()  # Added for light graph
+        self.light_graph = pg.PlotWidget()
 
         for graph in [self.temperature_graph, self.humidity_graph, self.power_graph, self.light_graph]:
             graph.setBackground('black')
@@ -128,7 +128,7 @@ class TelemetryApp(QMainWindow):
         self.temperature_label.setText(f"Temperature: {temperature} °C")
         self.humidity_label.setText(f"Humidity: {humidity} %")
         self.power_label.setText(f"Power: {power} V")
-        self.light_label.setText(f"Light: {light}")  # Update light label
+        self.light_label.setText(f"Light: {light}")
 
     def update_graphs(self, temperature, humidity, power, light):
         self.counter += 1
@@ -136,12 +136,12 @@ class TelemetryApp(QMainWindow):
         self.temperature_data.append(temperature)
         self.humidity_data.append(humidity)
         self.power_data.append(power)
-        self.light_data.append(light)  # Append light data
+        self.light_data.append(light)
 
         self.temperature_curve.setData(self.time_data, self.temperature_data)
         self.humidity_curve.setData(self.time_data, self.humidity_data)
         self.power_curve.setData(self.time_data, self.power_data)
-        self.light_curve.setData(self.time_data, self.light_data)  # Update light graph
+        self.light_curve.setData(self.time_data, self.light_data)
 
 
 if __name__ == "__main__":
