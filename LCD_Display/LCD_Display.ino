@@ -17,6 +17,7 @@ void setup()
 
 void loop()
 {
+  // Read temperature and humidity from DHT sensor
   float temperature = dht.readTemperature();
   float humidity = dht.readHumidity();
 
@@ -27,8 +28,12 @@ void loop()
     humidity = 0.0;
   }
 
+  // Read voltage from analog pin A0
   int sensorValue = analogRead(A0);
   float voltage = sensorValue * (5.0 / 1023.0);
+
+  // Read light level from pin D5 (as an analog input)
+  int lightLevel = analogRead(A1); // Assuming A1 corresponds to D5 on your board
 
   lcd.clear();
   lcd.setCursor(0, 0);
@@ -48,7 +53,8 @@ void loop()
   Serial.print(humidity, 1);
   Serial.print("%, Rail V: ");
   Serial.print(voltage, 2);
-  Serial.println("V");
+  Serial.print("V, Light: ");
+  Serial.println(lightLevel);
 
   delay(1000);
 }

@@ -26,11 +26,13 @@ class TelemetryApp(QMainWindow):
         self.temperature_label = QLabel("Temperature: N/A")
         self.humidity_label = QLabel("Humidity: N/A")
         self.power_label = QLabel("Power: N/A")
+        self.light_label = QLabel("Light: N/A")  # New label
 
         label_style = "color: #00FF00; font-size: 24px; font-family: Consolas;"
         self.temperature_label.setStyleSheet(label_style)
         self.humidity_label.setStyleSheet(label_style)
         self.power_label.setStyleSheet(label_style)
+        self.light_label.setStyleSheet(label_style)  # Style for light label
 
         self.temperature_graph = pg.PlotWidget()
         self.humidity_graph = pg.PlotWidget()
@@ -52,6 +54,7 @@ class TelemetryApp(QMainWindow):
         label_layout = QVBoxLayout()
         label_layout.addWidget(self.temperature_label)
         label_layout.addWidget(self.humidity_label)
+        label_layout.addWidget(self.light_label)  # Add light label above power
         label_layout.addWidget(self.power_label)
 
         graph_layout = QVBoxLayout()
@@ -103,22 +106,24 @@ class TelemetryApp(QMainWindow):
                 line = self.ser.readline().decode('utf-8').strip()
                 print(f"Raw Data: {line}")
 
-                if line.startswith("Temp:") and "Hum:" in line and "Rail V:" in line:
+                if line.startswith("Temp:") and "Hum:" in line and "Rail V:" in line and "Light:" in line:
                     temperature_part = line.split(",")[0].split(":")[1].strip().replace("C", "")
                     humidity_part = line.split(",")[1].split(":")[1].strip().replace("%", "")
                     power_part = line.split(",")[2].split(":")[1].strip().replace("V", "")
+                    light_part = line.split(",")[3].split(":")[1].strip()  # Parse light
 
-                    self.update_labels(temperature_part, humidity_part, power_part)
+                    self.update_labels(temperature_part, humidity_part, power_part, light_part)
                     self.update_graphs(float(temperature_part), float(humidity_part), float(power_part))
                 else:
                     print("Unexpected Data Format")
             except Exception as e:
                 print(f"Error reading telemetry: {e}")
 
-    def update_labels(self, temperature, humidity, power):
+    def update_labels(self, temperature, humidity, power, light):
         self.temperature_label.setText(f"Temperature: {temperature} °C")
         self.humidity_label.setText(f"Humidity: {humidity} %")
         self.power_label.setText(f"Power: {power} V")
+        self.light_label.setText(f"Light: {light}")  # Update light label
 
     def update_graphs(self, temperature, humidity, power):
         self.counter += 1
