@@ -1,29 +1,79 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget
-from PyQt5.QtCore import QTimer
+from PyQt5.QtWidgets import QApplication, QMainWindow, QLabel, QVBoxLayout, QWidget, QHBoxLayout
+from PyQt5.QtCore import QTimer, Qt
+import pyqtgraph as pg
 import serial
 from serial.tools import list_ports
+from collections import deque
 
 
 class TelemetryApp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Telemetry Dashboard")
-        self.setGeometry(100, 100, 400, 300)
+        self.setWindowState(Qt.WindowFullScreen)  # Full-screen mode
+
+        # Initialize data storage for graphing
+        self.temperature_data = deque(maxlen=100)
+        self.humidity_data = deque(maxlen=100)
+        self.power_data = deque(maxlen=100)
+        self.time_data = deque(maxlen=100)
+        self.counter = 0
+
+        # Add main title
+        self.main_title = QLabel("JankBot Telemetry")
+        self.main_title.setStyleSheet("color: white; font-size: 64px; font-family: Consolas;")
+        self.main_title.setAlignment(Qt.AlignCenter)
 
         # Initialize UI components
         self.temperature_label = QLabel("Temperature: N/A")
         self.humidity_label = QLabel("Humidity: N/A")
         self.power_label = QLabel("Power: N/A")
 
-        # Set up layout
-        layout = QVBoxLayout()
-        layout.addWidget(self.temperature_label)
-        layout.addWidget(self.humidity_label)
-        layout.addWidget(self.power_label)
+        # Set label styles
+        label_style = "color: white; font-size: 24px; font-family: Consolas;"  # White text
+        self.temperature_label.setStyleSheet(label_style)
+        self.humidity_label.setStyleSheet(label_style)
+        self.power_label.setStyleSheet(label_style)
+
+        # Create graphs
+        self.temperature_graph = pg.PlotWidget()
+        self.humidity_graph = pg.PlotWidget()
+        self.power_graph = pg.PlotWidget()
+
+        # Customize graph appearance
+        for graph in [self.temperature_graph, self.humidity_graph, self.power_graph]:
+            graph.setBackground('black')
+            graph.getAxis('left').setPen('w')
+            graph.getAxis('bottom').setPen('w')
+
+        self.temperature_graph.setTitle("Temperature", color="w", size="16pt")
+        self.humidity_graph.setTitle("Humidity", color="w", size="16pt")
+        self.power_graph.setTitle("Power", color="w", size="16pt")
+
+        self.temperature_curve = self.temperature_graph.plot(pen=pg.mkPen('r', width=2))
+        self.humidity_curve = self.humidity_graph.plot(pen=pg.mkPen('g', width=2))
+        self.power_curve = self.power_graph.plot(pen=pg.mkPen('b', width=2))
+
+        # Set up layouts
+        label_layout = QVBoxLayout()
+        label_layout.addWidget(self.main_title)
+        label_layout.addWidget(self.temperature_label)
+        label_layout.addWidget(self.humidity_label)
+        label_layout.addWidget(self.power_label)
+
+        graph_layout = QVBoxLayout()
+        graph_layout.addWidget(self.temperature_graph)
+        graph_layout.addWidget(self.humidity_graph)
+        graph_layout.addWidget(self.power_graph)
+
+        main_layout = QHBoxLayout()
+        main_layout.addLayout(label_layout)
+        main_layout.addLayout(graph_layout)
 
         central_widget = QWidget()
-        central_widget.setLayout(layout)
+        central_widget.setLayout(main_layout)
+        central_widget.setStyleSheet("background-color: black;")  # Black background
         self.setCentralWidget(central_widget)
 
         # Initialize serial connection
@@ -62,12 +112,13 @@ class TelemetryApp(QMainWindow):
                 
                 # Parse the specific format from Arduino
                 if line.startswith("Temp:") and "Hum:" in line and "Rail V:" in line:
-                    temperature_part = line.split(",")[0].split(":")[1].strip()
-                    humidity_part = line.split(",")[1].split(":")[1].strip()
-                    power_part = line.split(",")[2].split(":")[1].strip()
+                    temperature_part = line.split(",")[0].split(":")[1].strip().replace("C", "")
+                    humidity_part = line.split(",")[1].split(":")[1].strip().replace("%", "")
+                    power_part = line.split(",")[2].split(":")[1].strip().replace("V", "")
 
-                    # Update the labels
+                    # Update the labels and graphs
                     self.update_labels(temperature_part, humidity_part, power_part)
+                    self.update_graphs(float(temperature_part), float(humidity_part), float(power_part))
                 else:
                     print("Unexpected Data Format")  # Debugging: Handle unexpected formats
             except Exception as e:
@@ -77,6 +128,17 @@ class TelemetryApp(QMainWindow):
         self.temperature_label.setText(f"Temperature: {temperature} °C")
         self.humidity_label.setText(f"Humidity: {humidity} %")
         self.power_label.setText(f"Power: {power} V")
+
+    def update_graphs(self, temperature, humidity, power):
+        self.counter += 1
+        self.time_data.append(self.counter)
+        self.temperature_data.append(temperature)
+        self.humidity_data.append(humidity)
+        self.power_data.append(power)
+
+        self.temperature_curve.setData(self.time_data, self.temperature_data)
+        self.humidity_curve.setData(self.time_data, self.humidity_data)
+        self.power_curve.setData(self.time_data, self.power_data)
 
 
 if __name__ == "__main__":
