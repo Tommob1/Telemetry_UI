@@ -23,3 +23,10 @@ def initialize_serial_connection():
 
 initialize_serial_connection()
 
+root = tk.Tk()
+root.title("Telemetry")
+root.geometry("1280x720")
+root.configure(bg='black')
+
+text_color = "#00ff00"
+font_style = ("Consolas", 12)
