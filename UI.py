@@ -75,7 +75,7 @@ class TelemetryApp(QMainWindow):
         self.ser = self.initialize_serial_connection()
         self.timer = QTimer(self)
         self.timer.timeout.connect(self.read_telemetry)
-        self.timer.start(1000)
+        self.timer.start(500)
 
     def initialize_serial_connection(self):
         port = self.find_arduino_port()
