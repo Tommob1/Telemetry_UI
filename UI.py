@@ -19,7 +19,7 @@ class TelemetryApp(QMainWindow):
         self.time_data = deque(maxlen=100)
         self.counter = 0
 
-        self.main_title = QLabel("JankBot Telemetry")
+        self.main_title = QLabel("Live Telemetry")
         self.main_title.setStyleSheet("color: #00FF00; font-size: 35px; font-family: Consolas;")
         self.main_title.setAlignment(Qt.AlignCenter)
 
