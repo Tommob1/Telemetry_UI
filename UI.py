@@ -13,13 +13,11 @@ class TelemetryApp(QMainWindow):
 
         # Initialize UI components
         self.temperature_label = QLabel("Temperature: N/A")
-        self.humidity_label = QLabel("Humidity: N/A")
         self.power_label = QLabel("Power: N/A")
 
         # Set up layout
         layout = QVBoxLayout()
         layout.addWidget(self.temperature_label)
-        layout.addWidget(self.humidity_label)
         layout.addWidget(self.power_label)
 
         central_widget = QWidget()
@@ -46,20 +44,6 @@ class TelemetryApp(QMainWindow):
         else:
             print("Arduino not found.")
         return None
-    
-    def read_telemetry(self):
-        if self.ser and self.ser.in_waiting > 0:
-            try:
-                line = self.ser.readline().decode('utf-8').strip()
-                print(f"Raw Data: {line}")  # Debugging: Print raw data
-                data = line.split(",")  # Assuming "temp,hum,power" format from Arduino
-                if len(data) == 3:
-                    temperature, humidity, power = data
-                    self.update_labels(temperature, humidity, power)
-                else:
-                    print(f"Unexpected Data Format: {data}")  # Debugging: Print unexpected format
-            except Exception as e:
-                print(f"Error reading telemetry: {e}")
 
     def find_arduino_port(self):
         ports = list(list_ports.comports())
@@ -72,17 +56,23 @@ class TelemetryApp(QMainWindow):
         if self.ser and self.ser.in_waiting > 0:
             try:
                 line = self.ser.readline().decode('utf-8').strip()
-                data = line.split(",")  # Assuming "temp,hum,power" format from Arduino
-                if len(data) == 3:
-                    temperature, humidity, power = data
-                    self.update_labels(temperature, humidity, power)
+                print(f"Raw Data: {line}")  # Debugging: Print raw data
+                
+                # Parse the specific format from Arduino
+                if line.startswith("Temp:") and "Rail V:" in line:
+                    temperature_part = line.split(",")[0].split(":")[1].strip()
+                    power_part = line.split(",")[1].split(":")[1].strip()
+
+                    # Update the labels
+                    self.update_labels(temperature_part, power_part)
+                else:
+                    print("Unexpected Data Format")  # Debugging: Handle unexpected formats
             except Exception as e:
                 print(f"Error reading telemetry: {e}")
 
-    def update_labels(self, temperature, humidity, power):
+    def update_labels(self, temperature, power):
         self.temperature_label.setText(f"Temperature: {temperature} °C")
-        self.humidity_label.setText(f"Humidity: {humidity} %")
-        self.power_label.setText(f"Power: {power} W")
+        self.power_label.setText(f"Power: {power} V")
 
 
 if __name__ == "__main__":
