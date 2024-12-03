@@ -16,6 +16,7 @@ class TelemetryApp(QMainWindow):
         self.temperature_data = deque(maxlen=100)
         self.humidity_data = deque(maxlen=100)
         self.power_data = deque(maxlen=100)
+        self.light_data = deque(maxlen=100)  # Added for light graph
         self.time_data = deque(maxlen=100)
         self.counter = 0
 
@@ -26,19 +27,20 @@ class TelemetryApp(QMainWindow):
         self.temperature_label = QLabel("Temperature: N/A")
         self.humidity_label = QLabel("Humidity: N/A")
         self.power_label = QLabel("Power: N/A")
-        self.light_label = QLabel("Light: N/A")  # New label
+        self.light_label = QLabel("Light: N/A")
 
         label_style = "color: #00FF00; font-size: 24px; font-family: Consolas;"
         self.temperature_label.setStyleSheet(label_style)
         self.humidity_label.setStyleSheet(label_style)
         self.power_label.setStyleSheet(label_style)
-        self.light_label.setStyleSheet(label_style)  # Style for light label
+        self.light_label.setStyleSheet(label_style)
 
         self.temperature_graph = pg.PlotWidget()
         self.humidity_graph = pg.PlotWidget()
         self.power_graph = pg.PlotWidget()
+        self.light_graph = pg.PlotWidget()  # Added for light graph
 
-        for graph in [self.temperature_graph, self.humidity_graph, self.power_graph]:
+        for graph in [self.temperature_graph, self.humidity_graph, self.power_graph, self.light_graph]:
             graph.setBackground('black')
             graph.getAxis('left').setPen('w')
             graph.getAxis('bottom').setPen('w')
@@ -46,10 +48,12 @@ class TelemetryApp(QMainWindow):
         self.temperature_graph.setTitle("Temperature", color="w", size="16pt")
         self.humidity_graph.setTitle("Humidity", color="w", size="16pt")
         self.power_graph.setTitle("Power", color="w", size="16pt")
+        self.light_graph.setTitle("Light", color="w", size="16pt")  # Title for light graph
 
         self.temperature_curve = self.temperature_graph.plot(pen=pg.mkPen('r', width=2))
         self.humidity_curve = self.humidity_graph.plot(pen=pg.mkPen('g', width=2))
         self.power_curve = self.power_graph.plot(pen=pg.mkPen('b', width=2))
+        self.light_curve = self.light_graph.plot(pen=pg.mkPen('y', width=2))  # Yellow for light graph
 
         label_layout = QVBoxLayout()
         label_layout.addWidget(self.temperature_label)
@@ -60,6 +64,7 @@ class TelemetryApp(QMainWindow):
         graph_layout = QVBoxLayout()
         graph_layout.addWidget(self.temperature_graph)
         graph_layout.addWidget(self.humidity_graph)
+        graph_layout.addWidget(self.light_graph)  # Add light graph
         graph_layout.addWidget(self.power_graph)
 
         content_layout = QHBoxLayout()
@@ -110,10 +115,10 @@ class TelemetryApp(QMainWindow):
                     temperature_part = line.split(",")[0].split(":")[1].strip().replace("C", "")
                     humidity_part = line.split(",")[1].split(":")[1].strip().replace("%", "")
                     power_part = line.split(",")[2].split(":")[1].strip().replace("V", "")
-                    light_part = line.split(",")[3].split(":")[1].strip()  # Parse light
+                    light_part = line.split(",")[3].split(":")[1].strip()
 
                     self.update_labels(temperature_part, humidity_part, power_part, light_part)
-                    self.update_graphs(float(temperature_part), float(humidity_part), float(power_part))
+                    self.update_graphs(float(temperature_part), float(humidity_part), float(power_part), float(light_part))
                 else:
                     print("Unexpected Data Format")
             except Exception as e:
@@ -125,16 +130,18 @@ class TelemetryApp(QMainWindow):
         self.power_label.setText(f"Power: {power} V")
         self.light_label.setText(f"Light: {light}")  # Update light label
 
-    def update_graphs(self, temperature, humidity, power):
+    def update_graphs(self, temperature, humidity, power, light):
         self.counter += 1
         self.time_data.append(self.counter)
         self.temperature_data.append(temperature)
         self.humidity_data.append(humidity)
         self.power_data.append(power)
+        self.light_data.append(light)  # Append light data
 
         self.temperature_curve.setData(self.time_data, self.temperature_data)
         self.humidity_curve.setData(self.time_data, self.humidity_data)
         self.power_curve.setData(self.time_data, self.power_data)
+        self.light_curve.setData(self.time_data, self.light_data)  # Update light graph
 
 
 if __name__ == "__main__":
