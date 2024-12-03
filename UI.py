@@ -1,8 +1,9 @@
 import tkinter as tk
 import serial
+from serial.tools import list_ports
 
 def find_arduino_port():
-    ports = list(serial.tools.list_ports.comports())
+    ports = list(list_ports.comports())
     for port in ports:
         if 'Arduino' in port.description or 'usbmodem' in port.device:
             return port.device
