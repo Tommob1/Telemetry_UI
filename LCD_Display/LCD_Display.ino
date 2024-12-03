@@ -18,8 +18,13 @@ void setup()
 void loop()
 {
   float temperature = dht.readTemperature();
+  float humidity = dht.readHumidity();
+
   if (isnan(temperature)) {
     temperature = 0.0;
+  }
+  if (isnan(humidity)) {
+    humidity = 0.0;
   }
 
   int sensorValue = analogRead(A0);
@@ -39,7 +44,9 @@ void loop()
 
   Serial.print("Temp: ");
   Serial.print(temperature, 1);
-  Serial.print("C, Rail V: ");
+  Serial.print("C, Hum: ");
+  Serial.print(humidity, 1);
+  Serial.print("%, Rail V: ");
   Serial.print(voltage, 2);
   Serial.println("V");
 

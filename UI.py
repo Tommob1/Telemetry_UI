@@ -13,11 +13,13 @@ class TelemetryApp(QMainWindow):
 
         # Initialize UI components
         self.temperature_label = QLabel("Temperature: N/A")
+        self.humidity_label = QLabel("Humidity: N/A")
         self.power_label = QLabel("Power: N/A")
 
         # Set up layout
         layout = QVBoxLayout()
         layout.addWidget(self.temperature_label)
+        layout.addWidget(self.humidity_label)
         layout.addWidget(self.power_label)
 
         central_widget = QWidget()
@@ -59,19 +61,21 @@ class TelemetryApp(QMainWindow):
                 print(f"Raw Data: {line}")  # Debugging: Print raw data
                 
                 # Parse the specific format from Arduino
-                if line.startswith("Temp:") and "Rail V:" in line:
+                if line.startswith("Temp:") and "Hum:" in line and "Rail V:" in line:
                     temperature_part = line.split(",")[0].split(":")[1].strip()
-                    power_part = line.split(",")[1].split(":")[1].strip()
+                    humidity_part = line.split(",")[1].split(":")[1].strip()
+                    power_part = line.split(",")[2].split(":")[1].strip()
 
                     # Update the labels
-                    self.update_labels(temperature_part, power_part)
+                    self.update_labels(temperature_part, humidity_part, power_part)
                 else:
                     print("Unexpected Data Format")  # Debugging: Handle unexpected formats
             except Exception as e:
                 print(f"Error reading telemetry: {e}")
 
-    def update_labels(self, temperature, power):
+    def update_labels(self, temperature, humidity, power):
         self.temperature_label.setText(f"Temperature: {temperature} °C")
+        self.humidity_label.setText(f"Humidity: {humidity} %")
         self.power_label.setText(f"Power: {power} V")
 
 
