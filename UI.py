@@ -48,23 +48,23 @@ class TelemetryApp(QMainWindow):
         self.temperature_graph.setTitle("Temperature", color="w", size="16pt")
         self.humidity_graph.setTitle("Humidity", color="w", size="16pt")
         self.power_graph.setTitle("Power", color="w", size="16pt")
-        self.light_graph.setTitle("Light", color="w", size="16pt")  # Title for light graph
+        self.light_graph.setTitle("Light", color="w", size="16pt")
 
         self.temperature_curve = self.temperature_graph.plot(pen=pg.mkPen('r', width=2))
         self.humidity_curve = self.humidity_graph.plot(pen=pg.mkPen('g', width=2))
         self.power_curve = self.power_graph.plot(pen=pg.mkPen('b', width=2))
-        self.light_curve = self.light_graph.plot(pen=pg.mkPen('y', width=2))  # Yellow for light graph
+        self.light_curve = self.light_graph.plot(pen=pg.mkPen('y', width=2))
 
         label_layout = QVBoxLayout()
         label_layout.addWidget(self.temperature_label)
         label_layout.addWidget(self.humidity_label)
-        label_layout.addWidget(self.light_label)  # Add light label above power
+        label_layout.addWidget(self.light_label)
         label_layout.addWidget(self.power_label)
 
         graph_layout = QVBoxLayout()
         graph_layout.addWidget(self.temperature_graph)
         graph_layout.addWidget(self.humidity_graph)
-        graph_layout.addWidget(self.light_graph)  # Add light graph
+        graph_layout.addWidget(self.light_graph)
         graph_layout.addWidget(self.power_graph)
 
         content_layout = QHBoxLayout()
@@ -142,7 +142,6 @@ class TelemetryApp(QMainWindow):
         self.humidity_curve.setData(self.time_data, self.humidity_data)
         self.power_curve.setData(self.time_data, self.power_data)
         self.light_curve.setData(self.time_data, self.light_data)
-
 
 if __name__ == "__main__":
     app = QApplication(sys.argv)
