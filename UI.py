@@ -10,7 +10,7 @@ class TelemetryApp(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Telemetry Dashboard")
-#        self.setWindowState(Qt.WindowFullScreen)
+        #self.setWindowState(Qt.WindowFullScreen)
 
         self.temperature_data = deque(maxlen=100)
         self.humidity_data = deque(maxlen=100)
