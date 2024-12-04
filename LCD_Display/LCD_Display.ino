@@ -29,9 +29,8 @@ void loop()
 
   int sensorValue = analogRead(A0);
   float voltage = sensorValue * (5.0 / 1023.0);
-
   int lightLevel = analogRead(A1);
-  
+
   lcd.clear();
   lcd.setCursor(0, 0);
   lcd.print("TEMP: ");

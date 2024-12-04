@@ -6,7 +6,6 @@ import serial
 from serial.tools import list_ports
 from collections import deque
 
-
 class TelemetryApp(QMainWindow):
     def __init__(self):
         super().__init__()
